@@ -1,7 +1,9 @@
 FROM centos
 
+ADD docker.repo /etc/yum.repos.d/docker.repo
+
 RUN yum update -y
-RUN yum install -y git python python-setuptools
+RUN yum install -y docker-engine git python python-setuptools
 
 RUN bash -c "git clone https://github.com/pearltrees/s3cmd-modification || echo 'Workaround for broken symlinks in repo'"
 WORKDIR /s3cmd-modification
@@ -11,7 +13,7 @@ RUN rm -rf /s3cmd-modification
 
 ADD s3dockerbackup.sh /s3dockerbackup.sh
 
-VOLUME /root/.s3cfg
+VOLUME /root/ # ~/.s3cfg
 
 CMD /s3dockerbackup.sh
 
