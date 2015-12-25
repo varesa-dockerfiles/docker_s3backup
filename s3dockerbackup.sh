@@ -48,7 +48,7 @@ then
 fi
 
 # Timestamp (sortable AND readable)
-stamp=`date +"%Y_%M_%d"`
+stamp=`date +"%Y_%m_%d"`
 
 # Feedback
 echo -e "Dumping to \e[1;32m$bucket/$stamp/\e[00m"
@@ -66,6 +66,8 @@ for container in $instances; do
     instancename=`docker inspect --format='{{.Name}}' $container | tr '/' '_'`
     imagename=`docker inspect --format='{{.Config.Image}}' $container | tr '/' '_'`
 
+    mounts=`docker inspect --format='{{range $mount := .Mounts}} {{$mount.Source}} {{end}}' $container`
+
     # Define our filenames
     filename="$stamp-$instancename-$imagename.docker.tar.gz"
     tmpfile="$tmpdir/$filename"
@@ -78,7 +80,10 @@ for container in $instances; do
 
     # Dump and gzip
     echo -e " creating \e[0;35m$tmpfile\e[00m"
-    docker export "$container" | gzip -c > "$tmpfile"
+    docker inspect "$container" > "$tmpdir/$container.json"
+    docker export "$container" | gzip -c > "$tmpdir/$container.tgz"
+    tar cfz "$tmpfile" $tmpdir/$container.json $tmpdir/$container.tgz $mounts
+    rm -f $tmpdir/$container.*
 
 done;
 
