@@ -54,7 +54,7 @@ stamp=`date +"%Y_%m_%d"`
 echo -e "Dumping to \e[1;32m$bucket/$stamp/\e[00m"
 
 # List all running docker instances
-instances=`docker ps -q -notrunc` 
+instances=`docker ps -q --no-trunc` 
 
 tmpdir="$tmpbackupdir/docker$stamp"
 mkdir $tmpdir
